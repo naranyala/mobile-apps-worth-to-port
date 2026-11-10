@@ -1,8 +1,8 @@
-# 🤖➡️🖥️ Android Apps Worth Porting to Desktop
+# 📱➡️🖥️ Mobile Apps Worth Porting to Desktop
 
-A curated catalog of **open-source Android apps** (GitHub / GitLab / Codeberg / F-Droid) that are worth porting to **Linux and other desktops** — because they're genuinely great, but Android is the only place you can run them.
+A curated catalog of **open-source mobile apps** (Android + iOS, on GitHub / GitLab / Codeberg / F-Droid) that are worth porting to **Linux and other desktops** — because they're genuinely great, but the phone is the only place you can run them.
 
-> The rule of thumb: a phone-first UI is nice; a desktop **without any good FOSS option** for the same job is a gap. This list catalogs the gaps.
+> The rule of thumb: a mobile-first UI is nice; a desktop **without any good FOSS option** for the same job is a gap. This list catalogs the gaps — and, now that iOS is in scope, it also catalogs what each platform can and cannot teach us about closing them.
 
 ---
 
@@ -10,6 +10,7 @@ A curated catalog of **open-source Android apps** (GitHub / GitLab / Codeberg / 
 
 - [Selection Criteria](#-selection-criteria)
 - [Scoring System](#-scoring-system)
+- [📱 Platform Reality — iOS & FOSS](#-platform-reality--ios--foss)
 - [🥇 Top Picks (Tier S)](#-top-picks-tier-s)
 - [📖 Full Catalog (by category)](#-full-catalog-by-category)
   - [Security & 2FA](#security--2fa)
@@ -25,7 +26,7 @@ A curated catalog of **open-source Android apps** (GitHub / GitLab / Codeberg / 
   - [Utilities & System](#utilities--system)
   - [Games & Emulation](#games--emulation)
 - [🚫 Don't Bother — Already Solved on Desktop](#-dont-bother--already-solved-on-desktop)
-- [🔒 Android-Bound — Porting Makes No Sense](#-android-bound--porting-makes-no-sense)
+- [🔒 Device-Bound — Porting Makes No Sense](#-device-bound--porting-makes-no-sense)
 - [📚 Lessons From Ports That Already Happened](#-lessons-from-ports-that-already-happened)
 - [🛠️ Porting Playbook](#️-porting-playbook)
 - [Evaluating a New Candidate](#evaluating-a-new-candidate)
@@ -40,11 +41,11 @@ A curated catalog of **open-source Android apps** (GitHub / GitLab / Codeberg / 
 
 An app belongs here when it checks **all** of the following:
 
-1. **Openly licensed** — an OSI-style FOSS license (GPL/MIT/Apache/MPL…), source hosted publicly (GitHub / GitLab / Codeberg).
-2. **Android-first, desktop-absent** — no mature, maintained FOSS desktop equivalent does the same job. *(Apps that already ship Linux builds are moved to [solved](#-dont-bother--already-solved-on-desktop).)*
+1. **Openly licensed** — an OSI-style FOSS license (GPL/MIT/Apache/MPL/AGPL…), source hosted publicly (GitHub / GitLab / Codeberg). Commercial "open-source in name" licenses (personal-use-only etc.) don't qualify.
+2. **Mobile-first, desktop-absent** — an Android or iOS app for which no mature, maintained FOSS desktop equivalent does the same job. *(Apps that already ship Linux builds are moved to [solved](#-dont-bother--already-solved-on-desktop).)*
 3. **Desktop-valuable** — the core value doesn't depend on phone-only hardware (GPS, camera, cellular). A port should be *useful*, not just *possible*.
 4. **Alive** — commits within the last year, or a community big enough to carry a port.
-5. **Portable-ish (bonus)** — logic/persistence is reusable: Kotlin/Java → JVM, Flutter → Flutter Linux, clean C++ core.
+5. **Portable-ish (bonus)** — logic/persistence is reusable: Kotlin/Java → JVM, Flutter → Flutter Linux & macOS, React Native → RN Desktop/Tauri, clean C++ core. Cross-phone apps (Android+iOS) with a shared core score highest here.
 
 ## 🧮 Scoring System
 
@@ -53,12 +54,48 @@ Each app is scored **0–3** on three axes — max **9/9**:
 | Axis | Meaning |
 |---|---|
 | **G — Desktop Gap** | 0 = desktop already covers it · 3 = nothing comparable exists on Linux |
-| **P — Portability** | 0 = full rewrite · 3 = most of the app transfers (Flutter / KMP / clean core) |
+| **P — Portability** | 0 = full rewrite · 3 = most of the app transfers (Flutter / KMP / clean core). A shared Android+iOS build (Flutter/KMP/RN) → both phones + desktop from one tree |
 | **V — Value** | 0 = nice-to-have · 3 = desktop users would feel this absence daily |
 
 **Tiers:** `7–9` 🥇 Tier S · `5–6` 🥈 Tier A · `3–4` 🥉 Tier B · `<3` ⬜ skip.
 
 **Legend for "Code" columns:** language · license · ⭐ GitHub stars (≈ Nov 2026). A 🤖 after an app name links to its F-Droid page.
+
+---
+
+## 📱 Platform Reality — iOS & FOSS
+
+An honest analysis of what "mobile" means when iOS is in scope. Three structural facts shape this catalog:
+
+### 1. iOS FOSS distribution is thinner by design
+| Constraint | Android | iOS |
+|---|---|---|
+| FOSS-first app store | **F-Droid** (whole philosophy) | none — App Store is the only mainstream channel; [SideStore](https://github.com/SideStore/SideStore)/AltStore do sideloading, but with developer-account and expiry ceilings |
+| Sideload freely | yes, since day one | no; EU's DMA now allows alternative marketplaces/notarization, but fees and gatekeeping remain |
+| TestFlight builds | n/a | expire after 90 days — FOSS "install from source" is a moving target |
+| Background hardware access (BLE, sensors) | generous | tightly restricted (e.g., no continuous background BLE scans — the reason **no Gadgetbridge-equivalent can exist on iOS**) |
+
+Consequence: the catalog skews Android. That's measurement, not bias.
+
+### 2. Stack asymmetry is the real porting border
+| Stack typical of | Porting toward desktop | Verdict |
+|---|---|---|
+| **Android-only Kotlin/Java apps** | Compose for Desktop / GTK shell w/ JVM logic | the classic route — the whole old Android list |
+| **Cross-phone FOSS** (Flutter, KMP, React Native — most *modern* iOS FOSS is this) | one tree already serves Android + iOS; adding Linux/macOS is incremental | **the highest-leverage candidates** — a port here benefits every platform at once |
+| **SwiftUI/Swift iOS-native apps** | nothing left Apple (SwiftUI cannot target Linux; Catalyst only extends to macOS) | iOS-native FOSS rarely survives the jump — they usually end up as macOS-only twins |
+
+So the honest title of the iOS rule is: **iOS contributes *learnings* and a few cross-phone jewels — not many port targets.**
+
+### 3. Verified iOS-side finds
+Genuine cross-phone FOSS with a desktop gap found (so far):
+
+| Score | App | Platforms | What it is | Code | Porting notes |
+|:--:|---|---|---|---|---|
+| 5 | [Zeus](https://github.com/ZeusLN/zeus) | Android + iOS | Self-custodial Bitcoin/Lightning wallet + remote LND/Core Lightning node manager; reproducible builds | TypeScript · **React Native** · AGPL-3 · ⭐1.4k | One of the few *first-class* FOSS mobile wallets on both stores, F-Droid included. Desktop gap: a tray/CLI dashboard for a self-hosted node is genuinely missing; the shared TypeScript logic can be re-hosted under a Tauri/Electron (Node) shell. ⚠️ Wallet-grade security bar — audit before shipping anything. |
+
+And the two most famous **iOS-native FOSS** apps, both verified to already ship macOS (so they close their own gap partially): [Ice Cubes](https://github.com/Dimillian/IceCubesApp) (Mastodon, AGPL-3, ⭐7.1k — iOS/iPadOS/**macOS**/visionOS) and [Damus](https://github.com/damus-io/damus) (Nostr, GPL-3, ⭐2.1k — iOS/**macOS**). Linux/Windows counterparts aren't their jobs — see the [solved list](#-dont-bother--already-solved-on-desktop).
+
+*The [iOS open-source index](https://github.com/dkhamsing/open-source-ios-apps) is where new candidates get mined — see [Discovery Pipeline](#️-discovery-pipeline).*
 
 ---
 
@@ -146,6 +183,7 @@ Same analysis as the top picks; rows sorted by score within each category. Tough
 |:--:|---|---|---|---|
 | **8** | [My Expenses](https://github.com/mtotschnig/MyExpenses) [🤖](https://f-droid.org/packages/org.totschnig.myexpenses/) | Multi-account finance manager: budgets, transfers, CSV, sync | ▲ Kotlin · GPL-3 · ⭐1.2k | Strong desktop gap. SQLite + CSV + planning logic sidesteps most Android-isms. |
 | 6 | [GreenStash](https://github.com/Pool-Of-Tears/GreenStash) [🤖](https://f-droid.org/packages/com.starry.greenstash/) | Savings-goal tracker with milestones | 🐦 Flutter · MIT · ⭐800 | Fast Flutter port; a tray applet for milestone nudges would complete it. |
+| 5 | [Zeus](https://github.com/ZeusLN/zeus) | Self-custodial Bitcoin/Lightning wallet + LND/Core Lightning remote-node manager (Android + iOS) | TypeScript (React Native) · AGPL-3 · ⭐1.4k | The one verified cross-phone FOSS desktop gap (details in [Platform Reality](#-platform-reality--ios--foss)) — desktop node dashboard is the honest target, wallet core stays. |
 | 4 | [Counted](https://github.com/counted-labs/counted) [🤖](https://f-droid.org/packages/fr.counted.app/) | Split-expenses with E2E-encrypted groups (no accounts, 150+ currencies) | 🐦 Flutter · AGPL-3 | Desktop helps laptop "split-the-bill" flows. ⚠️ Depends on the non-free counted.fr server (F-Droid anti-feature) — port only with a self-hostable backend story. |
 | 3 | [piggybudget](https://github.com/pmiddend/piggybudget) [🤖](https://f-droid.org/packages/de.php_tech.piggybudget/) | Dead-simple expense tracker | ☕ Kotlin · GPL-3 · ⭐~100 | Tiny, last updated 2019 — a good "learn the porting workflow" exercise, nothing more. |
 
@@ -199,7 +237,7 @@ Same analysis as the top picks; rows sorted by score within each category. Tough
 
 Great apps, but Linux already has a first-class answer. Recorded here so effort goes where it's actually missing.
 
-| Android app | Use this on desktop instead |
+| Mobile app | Use this on desktop instead |
 |---|---|
 | NewPipe | [FreeTube](https://github.com/FreeTubeApp/FreeTube) |
 | Thunderbird Android (K-9) | Thunderbird desktop |
@@ -224,15 +262,17 @@ Great apps, but Linux already has a first-class answer. Recorded here so effort 
 | Signal / Session / Delta Chat | Official desktop clients exist |
 | YouTube Music clients (InnerTune, Metro) | [th-ch/youtube-music](https://github.com/th-ch/youtube-music) (active, fully FOSS desktop YTM player) |
 | KitchenOwl (grocery lists) | KitchenOwl ships native desktop/web builds upstream |
+| Ice Cubes (Mastodon, iOS-native) | Ships iOS **and** macOS natively; Linux gets Tuba, Fediverse web covers the rest |
+| Damus (Nostr, iOS-native) | Ships iOS **and** macOS natively; Linux has several nostr clients + web clients to fill the remaining gap |
 | YouTube downloaders | yt-dlp + [Parabolic](https://github.com/NickvisionApps/Parabolic) |
 
-## 🔒 Android-Bound — Porting Makes No Sense
+## 🔒 Device-Bound — Porting Makes No Sense
 
-These depend on Android-only plumbing (VpnService, AccessibilityService, PackageManager, camera/GPS sensors, APK install/Keystore), so a desktop port would hollow them out:
+These depend on phone-only plumbing (VpnService, AccessibilityService, PackageManager, camera/GPS sensors, APK install/Keystore), so a desktop port would hollow them out:
 
 - **Firewalls/trackers:** NetGuard, RethinkDNS, TrackerControl, AFWall+ — desktop firewalls already exist.
 - **Automation:** Key Mapper, Easer — live on Accessibility/InputMethod plumbing.
-- **App stores & device mgmt:** Neo Store, Droid-ify, Obtainium, App Manager, Neo Backup, Shizuku — they install/manipulate Android packages.
+- **App stores & device mgmt:** Neo Store, Droid-ify, Obtainium, App Manager, Neo Backup, Shizuku — they install/manipulate Android packages. *(iOS analogs: [SideStore](https://github.com/SideStore/SideStore), Feather — same verdict, same reasoning.)*
 - **Sensor apps:** Sky Map, phyphox, OpenTracks/FitoTrack (GPS), Open Camera, Binary Eye (camera) — the *phone* is the instrument. *(Partials worth extracting are flagged in the [catalog](#-full-catalog-by-category).)*
 - **Bridge apps (phone ↔ world) — port the *other* end instead:** [SmsForwarder](https://github.com/pppscn/SmsForwarder) (⭐28.8k, BSD-2 — forwards SMS/calls/notifications to Telegram/email/webhook), KDE Connect, phone-as-webcam tools, tasker-bridges. The Android side should stay; what's missing on Linux is a clean **receiver/server CLI + tray**. If a bridge has no desktop receiver, build that — don't port the phone app.
 
@@ -332,7 +372,8 @@ The heavyweight ring — only when the core is the crown. Keep the computational
 | **Compose for Desktop** | Source app is Compose (Path B); you want identical UI across phone+desktop | Apache-2.0 | Skia draws its own style — not GTK/KDE native; heavier RAM |
 | **Flutter** | Source app is Flutter (Path A) | BSD-3 | Desktop widgets are Flutter's least-mature tier; don't expect a GTK-like feel |
 | **Qt6 / QML** | C++ core exists (Path D); KDE-first | LGPL (free) | Design the shell around KDE patterns, not Android ones |
-| **Tauri / Electron** | The project already has a strong **web UI**; you're wrapping, not porting | MIT / permissive | Ship only if a wrapper beats a browser tab: offline mode, tray, global keybinds — otherwise don't |
+| **Tauri / Electron** | The shared logic is Node-friendly (e.g. React Native); you're wrapping, not porting | MIT / permissive | Ship only if a wrapper beats a browser tab: offline mode, tray, global keybinds — otherwise don't |
+| **SwiftUI / Swift** | Source app is iOS-native (Catalyst keeps it macOS-only); you want a macOS twin | MIT (tooling) / Swift is open | SwiftUI targets only Apple platforms — a Linux/Win port means a different toolkit + new UI; treat iOS-native apps as macOS-twins, not Linux ports |
 
 **Decision heuristic:** *the source app's framework wins by default* (Path A/B); if the UI must be rebuilt anyway (Path C), prefer native GNOME/KDE for polish and frictionless distribution.
 
@@ -367,6 +408,7 @@ The catalog decays every month: apps get ports (→ solved), apps get archived (
 | **[IzzyOnDroid](https://apt.izzysoft.de/fdroid/index.php)** | FOSS apps that haven't reached main F-Droid yet (fastest signal) | monthly |
 | **[Fossify org](https://github.com/orgs/FossifyOrg/repositories)** | The Simple Mobile Tools successor suite — watch which expose desktop gaps | each release |
 | **GitHub topic search**: [`topic:android language:kotlin license:gpl-3.0`](https://github.com/search?q=topic%3Aandroid+language%3Akotlin+license%3Agpl-3.0&type=repositories) (and `dart`) | Long-tail candidates ranked by stars | quarterly |
+| **[dkhamsing/open-source-ios-apps](https://github.com/dkhamsing/open-source-ios-apps)** | The canonical iOS FOSS index — filter for cross-phone frameworks (Flutter/KMP/RN); those are the iOS candidates that can actually reach Linux | quarterly |
 | **r/FOSSdroid**, [Lemmy FOSS Android](https://lemmy.world/c/fossdroid) | What users actually *wish* existed on desktop — complaints are candidate signals | ongoing |
 | **[Flathub trending](https://flathub.org/apps/collection/trending)** | Android-category apps *arriving* — they graduate from this list the day they ship Linux | monthly |
 | **Upstream roadmaps/issues** | Many projects have dormant "desktop?" issues — a nudge plus a PR can flip an app to solved | per candidate |
@@ -396,6 +438,7 @@ They are — deliberately quantized on a 0–3 scale so revision is cheap. Disag
 - [IzzyOnDroid](https://apt.izzysoft.de/fdroid/index.php) — pre-F-Droid FOSS apps, great discovery signal
 - [Fossify](https://www.fossify.org) — the Simple Mobile Tools successor suite
 - [Awesome Android FOSS (offa/android-foss)](https://github.com/offa/android-foss) — companion list: broad Android-FOSS coverage without the port angle
+- [iOS open-source apps (dkhamsing)](https://github.com/dkhamsing/open-source-ios-apps) — companion index for the iOS side of this catalog
 - [OpenAlternative](https://openalternative.co) / [Linux Alternative Project](https://linuxalt.com) — the desktop side of the comparison
 - [Flathub](https://flathub.org) — always confirm a desktop gap exists here *before* starting a port
 
